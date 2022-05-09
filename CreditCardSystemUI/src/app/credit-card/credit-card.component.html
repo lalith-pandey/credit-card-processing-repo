@@ -1,0 +1,85 @@
+<mat-card class="ccs-card">
+    <mat-card-header>
+        <mat-card-title>Add</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <div>
+            <form class="ccs-form" (ngSubmit)="onSubmit()" #cardAddForm="ngForm">
+                <mat-form-field class="ccs-full-width ngx-cc-form-field" appearance="fill">
+                    <mat-label>Name</mat-label>
+                    <input matInput placeholder="Enter your name" name="name" [(ngModel)]="creditCard.name" required
+                        #name="ngModel">
+                    <mat-error *ngIf="name.invalid && 
+                    (name.dirty || name.touched)">Name is required.</mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="ccs-full-width" appearance="fill">
+                    <mat-label>Card Number</mat-label>
+                    <input matInput placeholder="XXXX-XXXX-XXXX-XXXX" name="cardNumber"
+                        [(ngModel)]="creditCard.cardNumber" required maxlength="25" #ngCardNumber="ngModel"
+                        mask="XXXX XXXX XXXX XXXX"
+                        appCreditCardValidator>
+                    <mat-error *ngIf="(ngCardNumber.dirty || ngCardNumber.touched)
+                         && ngCardNumber.errors?.['cardInvalid']">
+                        Card Number is Invalid.
+                    </mat-error>
+
+
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" class="ccs-full-width" floatLabel="always">
+                    <mat-label>Limit</mat-label>
+                    <input matInput type="number" class="form-control" id="limit" required
+                        [(ngModel)]="creditCard.cardLimit" name="cardLimit">
+                    <span matPrefix>&pound;&nbsp;</span>
+                    <span matSuffix>.00</span>
+                </mat-form-field>
+
+                <button mat-raised-button color="primary" [disabled]="!cardAddForm.valid">Add</button>
+            </form>
+        </div>
+    </mat-card-content>
+    <mat-card-footer>
+        <div [hidden]="null == errorMessage">
+            <div class="alert alert-danger" role="alert">{{errorMessage}}</div>
+        </div>
+        <div [hidden]="!submitted && null == message">
+            <div class="alert alert-success" role="alert">{{message}}</div>
+        </div>
+
+    </mat-card-footer>
+</mat-card>
+
+<div id="card-results-div" *ngIf="(creditCards | async) as ccResults">
+    <mat-card *ngIf="ccResults.length > 0" class="ccs-card">
+        <mat-card-header>
+            <mat-card-title>Existing Cards</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="card-body">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Card Number</th>
+                                    <th>Balance</th>
+                                    <th>Limit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let card of creditCards | async">
+                                    <td>{{card.name}}</td>
+                                    <td>{{card.cardNumber}}</td>
+                                    <td>{{card.balance | currency :"GBP":"symbol"}}</td>
+                                    <td>{{card.cardLimit | currency:"GBP":"symbol"}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>
